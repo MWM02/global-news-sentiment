@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "global-news-sentiment"
+version = "0.1.0"
+description = "An ETL project for global news sentiment analysis"
+authors = [{ name = "MWM", email = "wijem004@gmail.com" }]
+dynamic = ["dependencies"]
+
+[project.scripts]
+run_etl = "scripts.run_etl:main"
+run_tests = "tests.run_tests:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
