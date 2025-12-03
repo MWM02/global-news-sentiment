@@ -32,7 +32,7 @@ def extract_sources(api_config: ApiConfig) -> pd.DataFrame:
 
 def extract_sources_execution(api_config: ApiConfig) -> pd.DataFrame:
     api_key = api_config["api_key"]
-    language = api_config.get("language", "en")
+    language = api_config["language"]
 
     base_url = api_config["base_url"]
     endpoint = api_config["sources_endpoint"]
