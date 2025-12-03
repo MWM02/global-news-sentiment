@@ -1,8 +1,8 @@
 from typing import TypedDict
 
 PATH_FOR_RAW_DATA = "data/raw"
-PATH_FOR_CLEAN_DATA = "data/clean"
-SOURCES_FILE_NAME = "source.csv"
+PATH_FOR_CLEAN_DATA = "data/processed"
+SOURCES_FILE_NAME = "sources.csv"
 ARTICLES_FILE_NAME = "articles.csv"
 
 
