@@ -1,8 +1,6 @@
 import pandas as pd
 from typing import Tuple
 from config.etl_config import load_etl_config
-from config.storage_config import load_storage_config
-from src.utils.file_utils import save_and_append_to_csv
 from src.utils.logging_utils import setup_logger
 from src.transform.clean_sources import clean_sources
 from src.transform.clean_articles import clean_articles
@@ -20,7 +18,6 @@ def transform_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     try:
         etl_config = load_etl_config()
-        storage_config = load_storage_config()
 
         logger.info("Starting data transformation process...")
 
@@ -51,30 +48,6 @@ def transform_data(
             cleaned_sources, enriched_articles
         )
         logger.info("Data merged successfully.")
-        save_and_append_to_csv(
-            cleaned_sources,
-            storage_config["output_dir_for_clean_data"],
-            "sources.csv",
-        )
-        save_and_append_to_csv(
-            merged_sources_articles,
-            storage_config["output_dir_for_clean_data"],
-            "sources_articles.csv",
-        )
-        save_and_append_to_csv(
-            filtered_articles,
-            storage_config["output_dir_for_clean_data"],
-            "articles.csv",
-        )
-        save_and_append_to_csv(
-            authors, storage_config["output_dir_for_clean_data"], "authors.csv"
-        )
-        save_and_append_to_csv(
-            author_article,
-            storage_config["output_dir_for_clean_data"],
-            "author_article.csv",
-        )
-        logger.info("Data transformation complete.")
 
         return (
             cleaned_sources,
