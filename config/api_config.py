@@ -1,6 +1,12 @@
 import os
 from typing import TypedDict
 
+DEFAULT_LANGUAGE = "en"
+DEFAULT_SORT_BY = "popularity"
+BASE_URL = "https://newsapi.org/v2"
+SOURCES_ENDPOINT = "/top-headlines/sources"
+ARTICLES_ENDPOINT = "/everything"
+
 
 class ApiConfigError(Exception):
     """Custom exception for API configuration errors."""
@@ -14,7 +20,6 @@ class ApiConfig(TypedDict):
     sort_by: str
     request_limit: int
     interval_seconds: int
-    days_before: int
     base_url: str
     sources_endpoint: str
     articles_endpoint: str
@@ -28,14 +33,15 @@ def load_api_config() -> ApiConfig:
 
     config: ApiConfig = {
         "api_key": api_key,
-        "language": "en",
-        "sort_by": "popularity",
-        "request_limit": 95,
-        "interval_seconds": 15,
-        "days_before": 2,
-        "base_url": "https://newsapi.org/v2",
-        "sources_endpoint": "/top-headlines/sources",
-        "articles_endpoint": "/everything",
+        "language": DEFAULT_LANGUAGE,
+        "sort_by": DEFAULT_SORT_BY,
+        "request_limit": int(os.getenv("NEWSAPI_REQUEST_LIMIT", 95)),
+        "interval_seconds": int(
+            os.getenv("NEWSAPI_REQUEST_INTERVAL_SECONDS", 15)
+        ),
+        "base_url": BASE_URL,
+        "sources_endpoint": SOURCES_ENDPOINT,
+        "articles_endpoint": ARTICLES_ENDPOINT,
     }
 
     return config
