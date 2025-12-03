@@ -26,7 +26,15 @@ def setup_env(argv: List[str]) -> None:
 
 
 def cleanup_previous_env() -> None:
-    keys_to_clear = ["NEWSAPI_KEY"]
+    keys_to_clear = [
+        "NEWSAPI_KEY",
+        "NEWSAPI_REQUEST_LIMIT",
+        "NEWSAPI_REQUEST_INTERVAL_SECONDS",
+        "MAX_ARTICLE_AGE_DAYS",
+        "DAYS_BACK",
+        "CYCLE_NUMBER",
+        "CYCLE_INTERVAL_HOURS",
+    ]
 
     for key in keys_to_clear:
         if key in os.environ:
