@@ -4,8 +4,9 @@ import timeit
 import time
 import pandas as pd
 from config.api_config import ApiConfig
+from config.etl_config import ETLConfig
 from src.utils.api_utils import handle_api_response
-from src.utils.date_utils import get_article_date_str
+from src.utils.date_utils import get_date_str
 from src.utils.logging_utils import setup_logger, log_extract_success
 
 EXPECTED_IMPORT_RATE = 1000
@@ -15,8 +16,7 @@ logger = setup_logger(__name__, "extract_articles.log", level=logging.DEBUG)
 
 
 def extract_articles(
-    sources_df: pd.DataFrame,
-    api_config: ApiConfig,
+    sources_df: pd.DataFrame, api_config: ApiConfig, etl_config: ETLConfig
 ) -> pd.DataFrame:
 
     start_time = timeit.default_timer()
@@ -28,16 +28,17 @@ def extract_articles(
         logger.info(f"Article extraction finished in {duration} seconds")
         return pd.DataFrame()
 
-    date_str = get_article_date_str(api_config)
-    request_limit = api_config.get("request_limit", 99)
-    interval_seconds = api_config.get("interval_seconds", 30)
+    date_str = get_date_str(etl_config["days_back"])
+    request_limit = api_config["request_limit"]
+    interval_seconds = api_config["interval_seconds"]
 
     source_ids = sources_df["id"].tolist()
     all_articles: list[pd.DataFrame] = []
     request_count = 0
 
     logger.info(
-        f"Starting article extraction for {len(source_ids)} sources from {date_str} "
+        f"Starting article extraction for {len(source_ids)} "
+        f"sources from {date_str} "
         f"(request_limit={request_limit}, interval_seconds={interval_seconds})"
     )
 
@@ -94,8 +95,8 @@ def extract_articles_for_source_execution(
     api_config: ApiConfig, source_id: str, date_str: str
 ) -> pd.DataFrame:
     api_key = api_config["api_key"]
-    language = api_config.get("language", "en")
-    sort_by = api_config.get("sort_by", "popularity")
+    language = api_config["language"]
+    sort_by = api_config["sort_by"]
 
     base_url = api_config["base_url"]
     endpoint_url = api_config["articles_endpoint"]
