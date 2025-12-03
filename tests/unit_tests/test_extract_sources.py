@@ -18,7 +18,6 @@ def api_config() -> ApiConfig:
         sort_by="popularity",
         request_limit=99,
         interval_seconds=30,
-        days_before=2,
         base_url="https://newsapi.org/v2",
         sources_endpoint="/top-headlines/sources",
         articles_endpoint="/everything",

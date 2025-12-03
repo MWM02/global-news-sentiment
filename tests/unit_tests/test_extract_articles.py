@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from unittest.mock import MagicMock
 from config.api_config import ApiConfig
-from src.utils.date_utils import get_article_date_str
+from config.etl_config import ETLConfig
 from src.extract.extract_articles import (
     extract_articles,
     extract_articles_for_source_execution,
@@ -19,10 +19,19 @@ def api_config() -> ApiConfig:
         sort_by="popularity",
         request_limit=99,
         interval_seconds=30,
-        days_before=2,
         base_url="https://newsapi.org/v2",
         sources_endpoint="/top-headlines/sources",
         articles_endpoint="/everything",
+    )
+
+
+@pytest.fixture
+def etl_config() -> ETLConfig:
+    return ETLConfig(
+        max_article_age_days=7,
+        days_back=2,
+        cycle_num=1,
+        cycle_interval_hours=0,
     )
 
 
@@ -84,7 +93,12 @@ def successful_response_with_results():
 
 
 def test_log_extract_articles_success(
-    mocker, mock_log_extract_success, mock_logger, mock_sources_df, api_config
+    mocker,
+    mock_log_extract_success,
+    mock_logger,
+    mock_sources_df,
+    api_config,
+    etl_config,
 ):
     mock_execution_time = 0.5
     mock_df = pd.DataFrame(
@@ -121,12 +135,15 @@ def test_log_extract_articles_success(
     mock_start_time = 10
     mock_end_time = 10.5
     mocker.patch(
+        "src.extract.extract_articles.get_date_str", return_value="2012-12-13"
+    )
+    mocker.patch(
         "src.extract.extract_articles.timeit.default_timer",
         side_effect=[mock_start_time, mock_end_time],
     )
     mocker.patch("src.extract.extract_articles.time.sleep")
 
-    df = extract_articles(mock_sources_df, api_config)
+    df = extract_articles(mock_sources_df, api_config, etl_config)
 
     mock_log_extract_success.assert_called_once_with(
         mock_logger,
@@ -137,10 +154,12 @@ def test_log_extract_articles_success(
     )
 
 
-def test_extract_articles_empty_sources_logs_warning(mock_logger, api_config):
+def test_extract_articles_empty_sources_logs_warning(
+    mock_logger, api_config, etl_config
+):
     empty_df = pd.DataFrame()
 
-    result = extract_articles(empty_df, api_config)
+    result = extract_articles(empty_df, api_config, etl_config)
 
     assert result.empty
     mock_logger.warning.assert_called_once_with(
@@ -160,6 +179,7 @@ def test_extract_articles_empty_sources_logs_warning(mock_logger, api_config):
 def test_extract_articles_with_different_request_limits(
     mocker,
     api_config,
+    etl_config,
     mock_logger,
     mock_log_extract_success,
     num_sources,
@@ -180,14 +200,14 @@ def test_extract_articles_with_different_request_limits(
     )
     mock_sleep = mocker.patch("src.extract.extract_articles.time.sleep")
 
-    extract_articles(mock_sources_df, api_config)
+    extract_articles(mock_sources_df, api_config, etl_config)
 
     assert mock_articles_for_source_execution.call_count == expected_calls
     assert mock_sleep.call_count == expected_calls - 1
 
 
 def test_extract_articles_logs_no_articles_for_source(
-    mocker, mock_logger, mock_sources_df, api_config
+    mocker, mock_logger, mock_sources_df, api_config, etl_config
 ):
     mock_empty_df = pd.DataFrame()
     mocker.patch(
@@ -195,7 +215,7 @@ def test_extract_articles_logs_no_articles_for_source(
         return_value=mock_empty_df,
     )
 
-    extract_articles(mock_sources_df, api_config)
+    extract_articles(mock_sources_df, api_config, etl_config)
 
     mock_logger.info.assert_any_call(
         "No articles returned for source abc-news"
@@ -203,14 +223,19 @@ def test_extract_articles_logs_no_articles_for_source(
 
 
 def test_extract_articles_handles_exception(
-    mocker, mock_logger, mock_log_extract_success, api_config, mock_sources_df
+    mocker,
+    mock_logger,
+    mock_log_extract_success,
+    api_config,
+    etl_config,
+    mock_sources_df,
 ):
     mocker.patch(
         "src.extract.extract_articles.extract_articles_for_source_execution",
         side_effect=Exception("API failure"),
     )
 
-    df = extract_articles(mock_sources_df, api_config)
+    df = extract_articles(mock_sources_df, api_config, etl_config)
 
     assert df.empty
     mock_logger.error.assert_called_once_with(
@@ -273,7 +298,7 @@ def test_extract_articles_for_source_execution_requests_with_correct_args(
     mocker, mock_sources_df, api_config, successful_response_with_results
 ):
     mock_source_id = mock_sources_df["id"].astype(str)
-    date_str = get_article_date_str(api_config)
+    date_str = "2012-12-01"
     expected_url = f"{api_config['base_url']}{api_config['articles_endpoint']}"
     expected_params = {
         "apiKey": api_config["api_key"],
