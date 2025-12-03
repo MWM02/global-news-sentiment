@@ -1,23 +1,29 @@
 import os
 import sys
 import time
-from logging import Logger
+from config.etl_config import load_etl_config
 from config.env_config import setup_env
 from src.extract.extract import extract_data
+from src.transform.transform import transform_data
 from src.utils.logging_utils import setup_logger
 
+logger = setup_logger("etl_pipeline", "etl_pipeline.log")
 
-def run_daily_cycle(env: str, logger: Logger) -> None:
+
+def run_etl_cycle(env: str) -> None:
     logger.info(f"Starting ETL cycle for environment: {env}")
 
     try:
         # Extract phase
         logger.info("Running extraction phase")
-        extracted_data = extract_data()
+        extracted_data = extract_data(env)
         sources, articles = extracted_data
         logger.info("Data extraction complete")
 
         # Transform phase
+        logger.info("Running transformation phase")
+        transformed_data = transform_data(extracted_data)
+        logger.info("Data transformation complete")
         # Load phase
 
         logger.info("ETL pipeline completed successfully")
@@ -29,13 +35,28 @@ def run_daily_cycle(env: str, logger: Logger) -> None:
 
 def main() -> None:
     setup_env(sys.argv)
-    env = os.getenv("ENV", "unknown")
-    logger = setup_logger("etl_pipeline", "etl_pipeline.log")
+    etl_config = load_etl_config()
+    env = os.getenv("ENV")
 
-    while True:
-        run_daily_cycle(env, logger)
-        logger.info("ETL cycle complete. Waiting 24 hours until next cycle...")
-        time.sleep(24 * 60 * 60)
+    num_of_cycles = etl_config["cycle_num"]
+    cycle_interval_hours = etl_config["cycle_interval_hours"]
+    cycle_interval_seconds = cycle_interval_hours * 60 * 60
+
+    if env is None:
+        raise EnvironmentError("The ENV environment variable is not set!")
+
+    for cycle in range(1, num_of_cycles + 1):
+        run_etl_cycle(env)
+
+        logger.info(
+            f"ETL cycle {cycle}/{num_of_cycles} complete. "
+            f"Waiting {cycle_interval_hours} hours until next cycle..."
+        )
+
+        if cycle < num_of_cycles:
+            time.sleep(cycle_interval_seconds)
+
+    logger.info("All ETL cycles completed.")
 
 
 if __name__ == "__main__":
