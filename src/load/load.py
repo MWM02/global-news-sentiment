@@ -5,7 +5,7 @@ from config.storage_config import load_storage_config
 from src.utils.file_utils import save_and_append_to_csv
 
 
-logger = setup_logger("transform_data", "transform_data.log")
+logger = setup_logger("load_data", "load_data.log")
 
 
 def load_data(
