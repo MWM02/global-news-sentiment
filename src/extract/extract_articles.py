@@ -68,7 +68,7 @@ def extract_articles(
             logger.error(
                 f"Failed to fetch articles for source {source_id}: {e}"
             )
-            return pd.DataFrame()
+            continue
 
         if request_count < request_limit and request_count < len(source_ids):
             time.sleep(interval_seconds)
