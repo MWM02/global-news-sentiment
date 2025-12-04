@@ -21,12 +21,8 @@ def find_project_root(marker_file: str = "README.md") -> str:
 ROOT_DIR = find_project_root()
 
 
-def save_and_append_to_csv(
-    df: pd.DataFrame, relative_output_dir: str, file_name: str
-) -> None:
-    output_dir = os.path.join(ROOT_DIR, relative_output_dir)
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, file_name)
+def save_and_append_to_csv(df: pd.DataFrame, output_path: str) -> None:
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     if not os.path.exists(output_path):
         df.to_csv(output_path, index=False, mode="w", header=True)
@@ -39,4 +35,4 @@ def save_and_append_to_csv(
             quoting=csv.QUOTE_ALL,
         )
 
-    print(f"Data saved to {os.path.join(output_path)}")
+    print(f"Data saved to {output_path}")
