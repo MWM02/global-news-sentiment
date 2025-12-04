@@ -6,6 +6,7 @@ from config.env_config import setup_env
 from src.extract.extract import extract_data
 from src.transform.transform import transform_data
 from src.load.load import load_data
+from src.analyse.analyse import launch_streamlit_app
 from src.utils.logging_utils import setup_logger
 
 logger = setup_logger("etl_pipeline", "etl_pipeline.log")
@@ -58,6 +59,10 @@ def main() -> None:
             time.sleep(cycle_interval_seconds)
 
     logger.info("All ETL cycles completed.")
+
+    logger.info("Starting analysis phase")
+    launch_streamlit_app()
+    logger.info("Launched Streamlit application")
 
 
 if __name__ == "__main__":
