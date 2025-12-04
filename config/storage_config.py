@@ -1,24 +1,22 @@
-from typing import TypedDict
+import os
+from config.types import StorageConfig
 
-PATH_FOR_RAW_DATA = "data/raw"
-PATH_FOR_CLEAN_DATA = "data/processed"
-SOURCES_FILE_NAME = "sources.csv"
-ARTICLES_FILE_NAME = "articles.csv"
-
-
-class StorageConfig(TypedDict):
-    output_dir_for_raw_data: str
-    output_dir_for_clean_data: str
-    sources_file_name: str
-    articles_file_name: str
+BASE_DIR = "data"
+RAW_DIR = os.path.join(BASE_DIR, "raw")
+CLEAN_DIR = os.path.join(BASE_DIR, "processed")
 
 
 def load_storage_config() -> StorageConfig:
-    config: StorageConfig = {
-        "output_dir_for_raw_data": PATH_FOR_RAW_DATA,
-        "output_dir_for_clean_data": PATH_FOR_CLEAN_DATA,
-        "sources_file_name": SOURCES_FILE_NAME,
-        "articles_file_name": ARTICLES_FILE_NAME,
+    return {
+        "raw_dir": RAW_DIR,
+        "clean_dir": CLEAN_DIR,
+        "raw_sources": os.path.join(RAW_DIR, "sources.csv"),
+        "raw_articles": os.path.join(RAW_DIR, "articles.csv"),
+        "clean_sources": os.path.join(CLEAN_DIR, "sources.csv"),
+        "clean_articles": os.path.join(CLEAN_DIR, "articles.csv"),
+        "clean_authors": os.path.join(CLEAN_DIR, "authors.csv"),
+        "clean_author_article": os.path.join(CLEAN_DIR, "author_article.csv"),
+        "clean_sources_articles": os.path.join(
+            CLEAN_DIR, "sources_articles.csv"
+        ),
     }
-
-    return config
