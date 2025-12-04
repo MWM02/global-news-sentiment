@@ -39,13 +39,21 @@ def extract_data(env: str) -> tuple[pd.DataFrame, pd.DataFrame]:
             api_config = load_api_config()
             etl_config = load_etl_config()
             sources_df = extract_sources(api_config)
+            articles_df = extract_articles(sources_df, api_config, etl_config)
+
+            if sources_df.empty:
+                logger.error("API returned no sources. Stopping ETL...")
+                raise ValueError("Empty sources dataframe returned from API.")
+
+            if articles_df.empty:
+                logger.error("API returned no articles. Stopping ETL...")
+                raise ValueError("Empty articles dataframe returned from API.")
+
             save_and_append_to_csv(
                 sources_df,
                 storage_config["output_dir_for_raw_data"],
                 storage_config["sources_file_name"],
             )
-
-            articles_df = extract_articles(sources_df, api_config, etl_config)
             save_and_append_to_csv(
                 articles_df,
                 storage_config["output_dir_for_raw_data"],
