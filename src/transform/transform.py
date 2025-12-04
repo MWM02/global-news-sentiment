@@ -1,6 +1,5 @@
 import pandas as pd
 from typing import Tuple
-from config.etl_config import load_etl_config
 from src.utils.logging_utils import setup_logger
 from src.transform.clean_sources import clean_sources
 from src.transform.clean_articles import clean_articles
@@ -14,19 +13,19 @@ logger = setup_logger("transform_data", "transform_data.log")
 
 
 def transform_data(
-    data: Tuple[pd.DataFrame, pd.DataFrame],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    data: Tuple[pd.DataFrame, pd.DataFrame], max_article_age_days: int
+) -> Tuple[
+    pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
+]:
     try:
-        etl_config = load_etl_config()
-
         logger.info("Starting data transformation process...")
-
+        sources_df, articles_df = data
         logger.info("Cleaning source data...")
-        cleaned_sources = clean_sources(data[0])
+        cleaned_sources = clean_sources(sources_df)
         logger.info("Sources data successfully cleaned.")
 
         logger.info("Cleaning articles data...")
-        cleaned_articles = clean_articles(data[1])
+        cleaned_articles = clean_articles(articles_df)
         logger.info("Articles data successfully cleaned.")
 
         logger.info("Normalise articles data...")
@@ -36,12 +35,14 @@ def transform_data(
         logger.info("Articles data successfully normalised.")
 
         logger.info("Filtering articles...")
-        filtered_articles = filter_articles(normalised_articles, etl_config)
+        filtered_articles = filter_articles(
+            normalised_articles, max_article_age_days
+        )
         logger.info("Articles data successfully filtered.")
 
         logger.info("Enriching data...")
         enriched_articles = enrich_sources_articles(filtered_articles)
-        logger.info("Data enriched succesfully.")
+        logger.info("Data enriched successfully.")
 
         logger.info("Merging sources and articles data...")
         merged_sources_articles = merge_sources_articles(
