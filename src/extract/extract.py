@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from typing import Tuple
 from config.types import ETLPipelineConfigs
@@ -44,12 +43,8 @@ def extract_data(
                 logger.error("API returned no articles. Stopping ETL...")
                 raise ValueError("Empty articles dataframe returned from API.")
 
-            save_and_append_to_csv(
-                sources_df, storage_config["raw_dir"], "sources.csv"
-            )
-            save_and_append_to_csv(
-                articles_df, storage_config["raw_dir"], "articles.csv"
-            )
+            save_and_append_to_csv(sources_df, storage_config["raw_sources"])
+            save_and_append_to_csv(articles_df, storage_config["raw_articles"])
 
             logger.info(
                 f"Data extraction completed successfully - "
