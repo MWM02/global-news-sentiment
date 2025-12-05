@@ -85,7 +85,9 @@ daily_count = (
 
 daily_count["date"] = pd.to_datetime(daily_count["date"])
 max_days = (daily_sentiment["date"].max() - daily_sentiment["date"].min()).days
-days_back = st.slider("Days Back", min_value=2, max_value=max_days, value=40)
+days_back = st.slider(
+    "Days Back", min_value=2, max_value=max_days, value=max_days
+)
 threshold = daily_sentiment["date"].max() - pd.Timedelta(days=days_back)
 
 filtered_sentiment = daily_sentiment[daily_sentiment["date"] >= threshold]
