@@ -26,7 +26,7 @@ def filter_by_date(
     df: pd.DataFrame, date_column: str, threshold: pd.Timestamp
 ) -> pd.DataFrame:
     df[date_column] = pd.to_datetime(df[date_column], errors="coerce")
-    return df[df[date_column] > threshold]
+    return df[df[date_column] >= threshold]
 
 
 def standardise_date(date_str: str) -> pd.Timestamp:
