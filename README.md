@@ -83,11 +83,10 @@ CYCLE_NUMBER=2
 CYCLE_INTERVAL_HOURS=24
 ```
 
-Create a test environment file `.env.dev`:
+Create a test environment file `.env.test`:
 
 ```env
 MAX_ARTICLE_AGE_DAYS=40
-DAYS_BACK=2
 CYCLE_NUMBER=1
 ```
 
