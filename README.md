@@ -34,13 +34,13 @@ The dataset is sourced from NewsAPI.org, which provides easy access with only an
 
 The data comes from two main endpoints:
 
-- **Sources** (`https://newsapi.org/docs/endpoints/sources`):  
+- **Sources** (`https://newsapi.org/v2/top-headlines/sources`):  
   Columns: `id`, `name`, `description`, `url`, `category`, `language`, `country`
 
-- **Articles** (`https://newsapi.org/docs/endpoints/everything`):  
+- **Articles** (`https://newsapi.org/v2/everything`):  
   Columns: `author`, `title`, `description`, `url`, `urlToImage`, `publishedAt`, `content`, `source_id`, `source_name`
 
-When running in a **test environment**, the ETL uses previously aggregated in `data/raw` data to avoid API calls. In **development mode**, the ETL fetches data from the API and saves/appends the collected data locally in `data/raw`.
+When running in a **test environment**, the ETL uses previously aggregated in `data/raw` data to avoid API calls. In **development environment**, the ETL fetches data from the API and saves/appends the collected data locally in `data/raw`.
 
 ---
 
